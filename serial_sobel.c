@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <omp.h>
 int sobel(int gx, int gy)
 {
     int val = (int)sqrt(gx*gx + gy*gy);
@@ -23,8 +23,8 @@ int main()
     char format[3];
     int width, height, maxval;
 
-    
-    fscanf(fp,"%s",format);            /*Reading the image format */
+    /*Reading the image format */
+    fscanf(fp,"%s",format);            
     fscanf(fp,"%d %d",&width,&height);
     fscanf(fp,"%d",&maxval);
     fgetc(fp);
@@ -38,13 +38,14 @@ int main()
     fclose(fp);
 
     /* Gaussian Kernel */
-
     int G[3][3] =
     {
         {1,2,1},
         {2,4,2},
         {1,2,1}
     };
+
+    double start = omp_get_wtime();
 
     for(int i=1;i<height-1;i++)
     {
@@ -102,6 +103,11 @@ int main()
         }
     }
 
+    double end = omp_get_wtime();
+
+    
+    printf("Serial execution time: %f seconds\n", end-start);
+    
     FILE *out = fopen("output.pgm","wb");
 
     fprintf(out,"P5\n%d %d\n255\n",width,height);
