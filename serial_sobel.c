@@ -23,11 +23,13 @@ int main()
     char format[3];
     int width, height, maxval;
 
-    fscanf(fp,"%s",format);
+    
+    fscanf(fp,"%s",format);            /*Reading the image format */
     fscanf(fp,"%d %d",&width,&height);
     fscanf(fp,"%d",&maxval);
     fgetc(fp);
 
+    /*Allocate the memory for dynamic input*/
     unsigned char *image = malloc(width*height);
     unsigned char *blur = malloc(width*height);
     unsigned char *edge = malloc(width*height);
