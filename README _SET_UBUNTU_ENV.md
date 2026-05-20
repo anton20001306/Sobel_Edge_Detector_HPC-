@@ -72,8 +72,8 @@ git checkout anton-branch
 
 # 🧠 Recommended Project Structure
 
+```text
 Sobel_Edge_Detector_HPC-/
-│
 ├── src/
 │   ├── serial_sobel.c
 │   ├── omp_sobel.c
@@ -94,6 +94,7 @@ Sobel_Edge_Detector_HPC-/
 ├── README.md
 ├── README_SET_UBUNTU_ENV.md
 └── run.sh
+```
 
 ---
 
