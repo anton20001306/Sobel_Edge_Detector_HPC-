@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 #pragma omp for schedule(static,chunk)
     for(i=1;i<height-1;i++)
     {
-        printf("Thread %d processing row %d\n",tid,i);
+        //printf("Thread %d processing row %d\n",tid,i);
 
         for(j=1;j<width-1;j++)
         {
