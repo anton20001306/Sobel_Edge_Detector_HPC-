@@ -1,72 +1,171 @@
-# 🚀 OpenMP Setup Guide (Ubuntu 22.04)
+from pathlib import Path
 
-This project uses **OpenMP** for parallel programming in C on Ubuntu 22.04.
+content = """
+# 🐧 Ubuntu 22.04 Setup Guide for OpenMP & MPI
+
+This guide explains how to set up the development environment for the Sobel Edge Detector HPC Project on Ubuntu 22.04.
 
 ---
 
-## 📦 Install Required Tools
+# 📦 Update Ubuntu
 
 Open terminal and run:
 
-```bash
 sudo apt update
-sudo apt install build-essential gcc g++ make -y
-```
+sudo apt upgrade -y
 
 ---
 
-## ⚙️ Compile OpenMP Program
+# ⚙️ Install Required Packages
 
-Use the `-fopenmp` flag when compiling:
+Install GCC, OpenMP, MPI, Git, and build tools:
 
-```bash
-gcc -fopenmp filename.c -o output
-```
+sudo apt install build-essential gcc g++ make git -y
 
-Example:
+Install MPI:
 
-```bash
-gcc -fopenmp sobel_serial.c -o sobel
-```
+sudo apt install openmpi-bin openmpi-common libopenmpi-dev -y
 
 ---
 
-## ▶️ Run the Program
+# ✅ Verify GCC Installation
 
-```bash
-./output
-```
-
-Example:
-
-```bash
-./sobel
-```
-
----
-
-## ✅ Verify GCC Installation
-
-```bash
 gcc --version
-```
 
 ---
 
-## 🧠 Check CPU Core Count
+# ✅ Verify MPI Installation
 
-```bash
-nproc
-```
+mpicc --version
+
+Check MPI version:
+
+mpirun --version
 
 ---
 
-## 🐧 Environment
+# ✅ Verify OpenMP Support
+
+Compile OpenMP code:
+
+gcc -fopenmp test_openmp.c -o test
+
+Run:
+
+./test
+
+---
+
+# 🚀 Clone Project Repository
+
+git clone https://github.com/anton20001306/Sobel_Edge_Detector_HPC-.git
+
+Enter project folder:
+
+cd Sobel_Edge_Detector_HPC-
+
+Checkout development branch:
+
+git checkout anton-branch
+
+---
+
+# 🧠 Recommended Project Structure
+
+Sobel_Edge_Detector_HPC-/
+│
+├── src/
+│   ├── serial_sobel.c
+│   ├── omp_sobel.c
+│   └── mpi_test.c
+│
+├── images/
+│   └── input.jpg
+│
+├── results/
+│   ├── edges.png
+│   ├── serial_output.png
+│   └── parallel_output.png
+│
+├── docs/
+│   ├── report.docx
+│   └── presentation.pptx
+│
+├── README.md
+├── README_SET_UBUNTU_ENV.md
+└── run.sh
+
+---
+
+# ▶️ Compile Serial Version
+
+gcc -fopenmp src/serial_sobel.c -o serial -lm
+
+Run:
+
+./serial
+
+---
+
+# ▶️ Compile OpenMP Parallel Version
+
+gcc -fopenmp src/omp_sobel.c -o parallel -lm
+
+Run:
+
+./parallel
+
+---
+
+# ▶️ Compile MPI Test Program
+
+mpicc src/mpi_test.c -o mpi_test
+
+Run with 4 processes:
+
+mpirun -np 4 ./mpi_test
+
+---
+
+# 🛠️ Open Project in VS Code
+
+Inside project folder:
+
+code .
+
+---
+
+# 📊 HPC Concepts Used
+
+- Serial Computing
+- Parallel Computing
+- OpenMP
+- MPI
+- Race Conditions
+- Thread Scheduling
+- Execution Time Analysis
+- SSD (Sum of Squared Difference)
+
+---
+
+# 🐧 Environment
 
 - OS: Ubuntu 22.04
 - Compiler: GCC
 - Parallel Library: OpenMP
+- Distributed Library: MPI
+- IDE: VS Code
 
 ---
 
 Happy Coding 🚀
+"""
+
+file_path = "/mnt/data/README_SET_UBUNTU_ENV.md"
+
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(content)
+
+print("README_SET_UBUNTU_ENV.md created successfully!")
+print(file_path)
+
