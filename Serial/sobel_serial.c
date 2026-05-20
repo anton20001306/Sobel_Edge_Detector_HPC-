@@ -28,8 +28,8 @@ int main()
 {
     int width, height, channels;
 
-    /* Load image (force grayscale) */
-    unsigned char *image = stbi_load("input.jpg",
+    /* Load image */
+    unsigned char *image = stbi_load("animal.jpeg",
                                      &width,
                                      &height,
                                      &channels,
