@@ -1,7 +1,6 @@
 from pathlib import Path
 
-content = """
-# 🐧 Ubuntu 22.04 Setup Guide for OpenMP & MPI
+content = """# 🐧 Ubuntu 22.04 Setup Guide for OpenMP & MPI
 
 This guide explains how to set up the development environment for the Sobel Edge Detector HPC Project on Ubuntu 22.04.
 
@@ -11,36 +10,48 @@ This guide explains how to set up the development environment for the Sobel Edge
 
 Open terminal and run:
 
+```bash
 sudo apt update
 sudo apt upgrade -y
+```
 
 ---
 
 # ⚙️ Install Required Packages
 
-Install GCC, OpenMP, MPI, Git, and build tools:
+Install GCC, OpenMP, Git, and build tools:
 
+```bash
 sudo apt install build-essential gcc g++ make git -y
+```
 
 Install MPI:
 
+```bash
 sudo apt install openmpi-bin openmpi-common libopenmpi-dev -y
+```
 
 ---
 
 # ✅ Verify GCC Installation
 
+```bash
 gcc --version
+```
 
 ---
 
 # ✅ Verify MPI Installation
 
+```bash
 mpicc --version
+```
 
 Check MPI version:
 
+```bash
 mpirun --version
+```
 
 ---
 
@@ -48,25 +59,35 @@ mpirun --version
 
 Compile OpenMP code:
 
+```bash
 gcc -fopenmp test_openmp.c -o test
+```
 
 Run:
 
+```bash
 ./test
+```
 
 ---
 
 # 🚀 Clone Project Repository
 
+```bash
 git clone https://github.com/anton20001306/Sobel_Edge_Detector_HPC-.git
+```
 
 Enter project folder:
 
+```bash
 cd Sobel_Edge_Detector_HPC-
+```
 
 Checkout development branch:
 
+```bash
 git checkout anton-branch
+```
 
 ---
 
@@ -100,31 +121,43 @@ Sobel_Edge_Detector_HPC-/
 
 # ▶️ Compile Serial Version
 
+```bash
 gcc -fopenmp src/serial_sobel.c -o serial -lm
+```
 
 Run:
 
+```bash
 ./serial
+```
 
 ---
 
 # ▶️ Compile OpenMP Parallel Version
 
+```bash
 gcc -fopenmp src/omp_sobel.c -o parallel -lm
+```
 
 Run:
 
+```bash
 ./parallel
+```
 
 ---
 
 # ▶️ Compile MPI Test Program
 
+```bash
 mpicc src/mpi_test.c -o mpi_test
+```
 
 Run with 4 processes:
 
+```bash
 mpirun -np 4 ./mpi_test
+```
 
 ---
 
@@ -132,7 +165,9 @@ mpirun -np 4 ./mpi_test
 
 Inside project folder:
 
+```bash
 code .
+```
 
 ---
 
@@ -162,11 +197,10 @@ code .
 Happy Coding 🚀
 """
 
-file_path = "/mnt/data/README_SET_UBUNTU_ENV.md"
+file_path = "README_SET_UBUNTU_ENV.md"
 
 with open(file_path, "w", encoding="utf-8") as f:
     f.write(content)
 
 print("README_SET_UBUNTU_ENV.md created successfully!")
-print(file_path)
-
+print(f"Saved at: {file_path}")
