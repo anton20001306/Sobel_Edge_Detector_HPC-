@@ -137,7 +137,9 @@ int main(int argc, char *argv[])
 
     printf("Execution Time: %f seconds\n",end-start);
 
-    FILE *out = fopen("output_parallel.pgm","wb");
+    //Chnage output file name to avoid overwriting
+    //FILE *out = fopen("output_parallel.pgm","wb");
+    FILE *out = fopen("omp_output.pgm","wb");
 
     fprintf(out,"P5\n%d %d\n255\n",width,height);
 

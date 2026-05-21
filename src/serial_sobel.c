@@ -108,7 +108,9 @@ int main()
     
     printf("Serial execution time: %f seconds\n", end-start);
     
-    FILE *out = fopen("output.pgm","wb");
+    //Change output file name to avoid overwriting
+    //FILE *out = fopen("output.pgm","wb");
+    FILE *out = fopen("serial_output.pgm","wb");
 
     fprintf(out,"P5\n%d %d\n255\n",width,height);
 
