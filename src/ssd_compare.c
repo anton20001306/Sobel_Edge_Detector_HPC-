@@ -77,32 +77,32 @@ int main()
 
     long long omp_ssd =
     calculateSSD(
-        "serial_output.pgm",
-        "omp_output.pgm"
+        "images/serial_output.pgm",
+        "images/omp_output.pgm"
     );
 
     long long mpi_ssd =
     calculateSSD(
-        "serial_output.pgm",
-        "mpi_output.pgm"
+        "images/serial_output.pgm",
+        "images/mpi_output.pgm"
     );
 
     long long mpighost_ssd =
     calculateSSD(
-        "serial_output.pgm",
-        "mpighost_output.pgm"
+        "images/serial_output.pgm",
+        "images/mpighost_output.pgm"
     );
 
     long long cuda_ssd =
     calculateSSD(
-        "serial_output.pgm",
-        "cuda_output.pgm"
+        "images/serial_output.pgm",
+        "images/cuda_output.pgm"
     );
 
     long long hybrid_ssd =
     calculateSSD(
-        "serial_output.pgm",
-        "hybrid_output.pgm"
+        "images/serial_output.pgm",
+        "images/hybrid_output.pgm"
     );
 
     printf("SSD (Serial vs OpenMP): %lld\n",

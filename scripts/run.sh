@@ -71,7 +71,7 @@ echo "MPI Ghost compilation successful."
 
 echo ""
 echo "[8] Running MPI Ghost Version..."
-mpirun -np 4 ./mpighost_sobel
+mpirun -np 4 .mpighost_sobel
 
 echo ""
 echo "---------------------------------------"

@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     int i,j,x,y;
     int chunk = 20;
 
-    FILE *fp = fopen("input.pgm","rb");
+    FILE *fp = fopen("images/input.pgm","rb");
 
     if(fp == NULL)
     {
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 
     //Chnage output file name to avoid overwriting
     //FILE *out = fopen("output_parallel.pgm","wb");
-    FILE *out = fopen("omp_output.pgm","wb");
+    FILE *out = fopen("images/omp_output.pgm","wb");
 
     fprintf(out,"P5\n%d %d\n255\n",width,height);
 
