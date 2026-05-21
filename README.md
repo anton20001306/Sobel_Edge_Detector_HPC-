@@ -54,3 +54,51 @@ Sobel_Edge_Detector_HPC-/
 │
 ├── README.md
 └── README_SET_UBUNTU_ENV.md
+
+# ⚙️ Build and Run Commands
+
+## ▶️ Serial Version
+
+Compile:
+
+```bash
+gcc -fopenmp src/serial_sobel.c -o serial -lm
+```
+
+Run:
+
+```bash
+./serial
+```
+
+---
+
+## ▶️ OpenMP Parallel Version
+
+Compile:
+
+```bash
+gcc -fopenmp src/omp_sobel.c -o parallel -lm
+```
+
+Run:
+
+```bash
+./parallel
+```
+
+---
+
+## ▶️ MPI Parallel Version
+
+Compile:
+
+```bash
+mpicc src/mpi_sobel.c -o mpi_sobel -lm
+```
+
+Run with 4 processes:
+
+```bash
+mpirun -np 4 ./mpi_sobel
+```
