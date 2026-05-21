@@ -39,11 +39,14 @@ The project is developed on **Ubuntu 22.04** for HPC (High Performance Computing
 Sobel_Edge_Detector_HPC-/
 │
 src/
-|   ├── serial_sobel.c
-|   ├── omp_sobel.c
-|   ├── mpi_sobel.c
-|   ├── mpighost_sobel.c
-|   └── ssd_compare.c
+src/
+    ├── serial_sobel.c
+    ├── omp_sobel.c
+    ├── mpi_sobel.c
+    ├── mpighost_sobel.c
+    ├── cuda_sobel.cu
+    ├── hybrid_mpi_cuda.cu
+    └── ssd_compare.c
 │
 ├── images/
 │   └── input.jpg
