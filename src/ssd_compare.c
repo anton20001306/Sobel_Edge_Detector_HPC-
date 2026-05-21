@@ -1,132 +1,138 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-long long calculate_ssd(unsigned char *img1,
-                        unsigned char *img2,
-                        int size)
+long long calculateSSD(
+    const char *file1,
+    const char *file2)
 {
+    FILE *fp1 = fopen(file1, "rb");
+    FILE *fp2 = fopen(file2, "rb");
+
+    if(fp1 == NULL || fp2 == NULL)
+    {
+        printf("Error opening files\n");
+        return -1;
+    }
+
+    char format1[3];
+    char format2[3];
+
+    int width1, height1, max1;
+    int width2, height2, max2;
+
+    fscanf(fp1, "%s", format1);
+    fscanf(fp1, "%d %d", &width1, &height1);
+    fscanf(fp1, "%d", &max1);
+    fgetc(fp1);
+
+    fscanf(fp2, "%s", format2);
+    fscanf(fp2, "%d %d", &width2, &height2);
+    fscanf(fp2, "%d", &max2);
+    fgetc(fp2);
+
+    if(width1 != width2 ||
+       height1 != height2)
+    {
+        printf("Image sizes differ\n");
+
+        fclose(fp1);
+        fclose(fp2);
+
+        return -1;
+    }
+
+    int size = width1 * height1;
+
+    unsigned char *img1 =
+    malloc(size);
+
+    unsigned char *img2 =
+    malloc(size);
+
+    fread(img1, 1, size, fp1);
+    fread(img2, 1, size, fp2);
+
+    fclose(fp1);
+    fclose(fp2);
+
     long long ssd = 0;
 
     for(int i = 0; i < size; i++)
     {
-        int diff = img1[i] - img2[i];
+        int diff =
+        img1[i] - img2[i];
 
         ssd += diff * diff;
     }
 
+    free(img1);
+    free(img2);
+
     return ssd;
-}
-
-void read_pgm(const char *filename,
-              unsigned char **image,
-              int *width,
-              int *height)
-{
-    FILE *fp = fopen(filename, "rb");
-
-    if(fp == NULL)
-    {
-        printf("Cannot open %s\n", filename);
-        exit(1);
-    }
-
-    char format[3];
-    int maxval;
-
-    fscanf(fp, "%s", format);
-    fscanf(fp, "%d %d", width, height);
-    fscanf(fp, "%d", &maxval);
-    fgetc(fp);
-
-    *image = malloc((*width) * (*height));
-
-    fread(*image, 1, (*width) * (*height), fp);
-
-    fclose(fp);
 }
 
 int main()
 {
-    unsigned char *serial_img;
-    unsigned char *openmp_img;
-    unsigned char *mpi_img;
-    unsigned char *mpighost_img;
-
-    int width, height;
-
-    /* Read Images */
-
-    read_pgm("serial_output.pgm",
-             &serial_img,
-             &width,
-             &height);
-
-    read_pgm("omp_output.pgm",
-             &openmp_img,
-             &width,
-             &height);
-
-    read_pgm("mpi_output.pgm",
-             &mpi_img,
-             &width,
-             &height);
-
-    read_pgm("mpighost_output.pgm",
-             &mpighost_img,
-             &width,
-             &height);
-
-    int size = width * height;
-
-    /* Calculate SSD */
-
-    long long ssd_openmp =
-    calculate_ssd(serial_img,
-                  openmp_img,
-                  size);
-
-    long long ssd_mpi =
-    calculate_ssd(serial_img,
-                  mpi_img,
-                  size);
-
-    long long ssd_mpighost =
-    calculate_ssd(serial_img,
-                  mpighost_img,
-                  size);
-
     printf("\n========== SSD RESULTS ==========\n");
 
+    long long omp_ssd =
+    calculateSSD(
+        "serial_output.pgm",
+        "omp_output.pgm"
+    );
+
+    long long mpi_ssd =
+    calculateSSD(
+        "serial_output.pgm",
+        "mpi_output.pgm"
+    );
+
+    long long mpighost_ssd =
+    calculateSSD(
+        "serial_output.pgm",
+        "mpighost_output.pgm"
+    );
+
+    long long cuda_ssd =
+    calculateSSD(
+        "serial_output.pgm",
+        "cuda_output.pgm"
+    );
+
+    long long hybrid_ssd =
+    calculateSSD(
+        "serial_output.pgm",
+        "hybrid_output.pgm"
+    );
+
     printf("SSD (Serial vs OpenMP): %lld\n",
-            ssd_openmp);
+            omp_ssd);
 
     printf("SSD (Serial vs MPI): %lld\n",
-            ssd_mpi);
+            mpi_ssd);
 
     printf("SSD (Serial vs MPI Ghost): %lld\n",
-            ssd_mpighost);
+            mpighost_ssd);
+
+    printf("SSD (Serial vs CUDA): %lld\n",
+            cuda_ssd);
+
+    printf("SSD (Serial vs Hybrid): %lld\n",
+            hybrid_ssd);
 
     printf("\n========== ANALYSIS ==========\n");
 
-    if(ssd_openmp == 0)
-        printf("OpenMP output is IDENTICAL to Serial\n");
-    else
-        printf("OpenMP output has differences\n");
+    if(omp_ssd == 0)
+        printf("OpenMP output is IDENTICAL\n");
 
-    if(ssd_mpi == 0)
-        printf("MPI output is IDENTICAL to Serial\n");
-    else
-        printf("MPI output has differences\n");
+    if(mpighost_ssd == 0)
+        printf("MPI Ghost output is IDENTICAL\n");
 
-    if(ssd_mpighost == 0)
-        printf("MPI Ghost output is IDENTICAL to Serial\n");
-    else
-        printf("MPI Ghost output has differences\n");
+    if(cuda_ssd == 0)
+        printf("CUDA output is IDENTICAL\n");
 
-    free(serial_img);
-    free(openmp_img);
-    free(mpi_img);
-    free(mpighost_img);
+    if(hybrid_ssd == 0)
+        printf("Hybrid output is IDENTICAL\n");
 
     return 0;
 }
