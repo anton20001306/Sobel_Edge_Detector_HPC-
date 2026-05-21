@@ -56,6 +56,42 @@ echo "[6] Running MPI Version..."
 mpirun -np 4 ./mpi_sobel
 
 echo ""
+echo "---------------------------------------"
+
+echo ""
+echo "[7] Compiling MPI Ghost Version..."
+mpicc src/mpighost_sobel.c -o mpighost_sobel -lm
+
+if [ $? -ne 0 ]; then
+    echo "MPI Ghost compilation failed!"
+    exit 1
+fi
+
+echo "MPI Ghost compilation successful."
+
+echo ""
+echo "[8] Running MPI Ghost Version..."
+mpirun -np 4 ./mpighost_sobel
+
+echo ""
+echo "---------------------------------------"
+
+echo ""
+echo "[9] Compiling SSD Comparison..."
+gcc src/ssd_compare.c -o ssd_compare
+
+if [ $? -ne 0 ]; then
+    echo "SSD compilation failed!"
+    exit 1
+fi
+
+echo "SSD compilation successful."
+
+echo ""
+echo "[10] Running SSD Comparison..."
+./ssd_compare
+
+echo ""
 echo "======================================="
 echo " All Executions Completed Successfully"
 echo "======================================="

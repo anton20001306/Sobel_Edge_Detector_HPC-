@@ -50,28 +50,35 @@ int main()
     unsigned char *serial_img;
     unsigned char *openmp_img;
     unsigned char *mpi_img;
+    unsigned char *mpighost_img;
 
     int width, height;
 
-    /* Read serial output */
+    /* Read Images */
+
     read_pgm("serial_output.pgm",
              &serial_img,
              &width,
              &height);
 
-    /* Read OpenMP output */
     read_pgm("omp_output.pgm",
              &openmp_img,
              &width,
              &height);
 
-    /* Read MPI output */
     read_pgm("mpi_output.pgm",
              &mpi_img,
              &width,
              &height);
 
+    read_pgm("mpighost_output.pgm",
+             &mpighost_img,
+             &width,
+             &height);
+
     int size = width * height;
+
+    /* Calculate SSD */
 
     long long ssd_openmp =
     calculate_ssd(serial_img,
@@ -83,6 +90,11 @@ int main()
                   mpi_img,
                   size);
 
+    long long ssd_mpighost =
+    calculate_ssd(serial_img,
+                  mpighost_img,
+                  size);
+
     printf("\n========== SSD RESULTS ==========\n");
 
     printf("SSD (Serial vs OpenMP): %lld\n",
@@ -90,6 +102,11 @@ int main()
 
     printf("SSD (Serial vs MPI): %lld\n",
             ssd_mpi);
+
+    printf("SSD (Serial vs MPI Ghost): %lld\n",
+            ssd_mpighost);
+
+    printf("\n========== ANALYSIS ==========\n");
 
     if(ssd_openmp == 0)
         printf("OpenMP output is IDENTICAL to Serial\n");
@@ -101,9 +118,15 @@ int main()
     else
         printf("MPI output has differences\n");
 
+    if(ssd_mpighost == 0)
+        printf("MPI Ghost output is IDENTICAL to Serial\n");
+    else
+        printf("MPI Ghost output has differences\n");
+
     free(serial_img);
     free(openmp_img);
     free(mpi_img);
+    free(mpighost_img);
 
     return 0;
 }
