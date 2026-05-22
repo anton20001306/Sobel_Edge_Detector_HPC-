@@ -12,7 +12,7 @@ int sobel(int gx, int gy)
 
 int main()
 {
-    FILE *fp = fopen("input.pgm","rb");
+    FILE *fp = fopen("images/input.pgm","rb");
 
     if(fp == NULL)
     {
@@ -106,11 +106,12 @@ int main()
     double end = omp_get_wtime();
 
     
-    printf("Serial execution time: %f seconds\n", end-start);
-    
+    //printf("Serial execution time: %f seconds\n", end-start);
+    printf("TIME: %f\n", end-start);
+
     //Change output file name to avoid overwriting
     //FILE *out = fopen("output.pgm","wb");
-    FILE *out = fopen("serial_output.pgm","wb");
+    FILE *out = fopen("images/serial_output.pgm","wb");
 
     fprintf(out,"P5\n%d %d\n255\n",width,height);
 

@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
     if(rank == 0)
     {
-        FILE *fp = fopen("input.pgm", "rb");
+        FILE *fp = fopen("images/input.pgm", "rb");
 
         if(fp == NULL)
         {
@@ -297,10 +297,14 @@ int main(int argc, char *argv[])
 
     double end = MPI_Wtime();
 
-    printf("Process %d finished in %f seconds\n",
-            rank,
-            end - start);
+    // printf("Process %d finished in %f seconds\n",
+    //         rank,
+    //         end - start);
 
+    if(rank == 0)
+    {
+        printf("TIME: %f\n", end-start);
+    }
     /* Root allocates final image */
 
     if(rank == 0)
@@ -325,7 +329,7 @@ int main(int argc, char *argv[])
     if(rank == 0)
     {
         FILE *out =
-        fopen("mpighost_output.pgm", "wb");
+        fopen("images/mpighost_output.pgm", "wb");
 
         fprintf(out,
                 "P5\n%d %d\n255\n",

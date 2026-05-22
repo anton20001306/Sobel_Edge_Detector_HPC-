@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     /* Process 0 reads image */
     if(rank == 0)
     {
-        FILE *fp = fopen("input.pgm", "rb");
+        FILE *fp = fopen("images/input.pgm", "rb");
 
         if(fp == NULL)
         {
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     /* Save final image */
     if(rank == 0)
     {
-        FILE *out = fopen("mpi_output.pgm", "wb");
+        FILE *out = fopen("images/mpi_output.pgm", "wb");
 
         fprintf(out, "P5\n%d %d\n255\n",
                 width,

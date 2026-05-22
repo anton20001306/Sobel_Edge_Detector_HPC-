@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 long long calculateSSD(
     const char *file1,
-    const char *file2)
+    const char *file2,
+    double *rmse)
 {
     FILE *fp1 = fopen(file1, "rb");
     FILE *fp2 = fopen(file2, "rb");
@@ -65,6 +67,8 @@ long long calculateSSD(
         ssd += diff * diff;
     }
 
+    *rmse = sqrt((double)ssd / size);
+
     free(img1);
     free(img2);
 
@@ -73,52 +77,47 @@ long long calculateSSD(
 
 int main()
 {
-    printf("\n========== SSD RESULTS ==========\n");
+    printf("\n========== SSD / RMSE RESULTS ==========\n");
+
+    double omp_rmse;
+    //double mpi_rmse;
+    double mpighost_rmse;
 
     long long omp_ssd =
     calculateSSD(
         "images/serial_output.pgm",
-        "images/omp_output.pgm"
+        "images/openmp_output.pgm",
+        &omp_rmse
     );
 
-    long long mpi_ssd =
-    calculateSSD(
-        "images/serial_output.pgm",
-        "images/mpi_output.pgm"
-    );
+    // long long mpi_ssd =
+    // calculateSSD(
+    //     "images/serial_output.pgm",
+    //     "images/mpi_output.pgm",
+    //     &mpi_rmse
+    // );
 
     long long mpighost_ssd =
     calculateSSD(
         "images/serial_output.pgm",
-        "images/mpighost_output.pgm"
+        "images/mpighost_output.pgm",
+        &mpighost_rmse
     );
 
-    long long cuda_ssd =
-    calculateSSD(
-        "images/serial_output.pgm",
-        "images/cuda_output.pgm"
-    );
+    printf("\nOpenMP Results\n");
+    printf("--------------------------\n");
+    printf("SSD  : %lld\n", omp_ssd);
+    printf("RMSE : %f\n", omp_rmse);
 
-    long long hybrid_ssd =
-    calculateSSD(
-        "images/serial_output.pgm",
-        "images/hybrid_output.pgm"
-    );
+    // printf("\nMPI Results\n");
+    // printf("--------------------------\n");
+    // printf("SSD  : %lld\n", mpi_ssd);
+    // printf("RMSE : %f\n", mpi_rmse);
 
-    printf("SSD (Serial vs OpenMP): %lld\n",
-            omp_ssd);
-
-    printf("SSD (Serial vs MPI): %lld\n",
-            mpi_ssd);
-
-    printf("SSD (Serial vs MPI Ghost): %lld\n",
-            mpighost_ssd);
-
-    printf("SSD (Serial vs CUDA): %lld\n",
-            cuda_ssd);
-
-    printf("SSD (Serial vs Hybrid): %lld\n",
-            hybrid_ssd);
+    printf("\nMPI Ghost Results\n");
+    printf("--------------------------\n");
+    printf("SSD  : %lld\n", mpighost_ssd);
+    printf("RMSE : %f\n", mpighost_rmse);
 
     printf("\n========== ANALYSIS ==========\n");
 
@@ -127,12 +126,6 @@ int main()
 
     if(mpighost_ssd == 0)
         printf("MPI Ghost output is IDENTICAL\n");
-
-    if(cuda_ssd == 0)
-        printf("CUDA output is IDENTICAL\n");
-
-    if(hybrid_ssd == 0)
-        printf("Hybrid output is IDENTICAL\n");
 
     return 0;
 }

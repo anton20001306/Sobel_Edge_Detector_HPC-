@@ -135,11 +135,11 @@ int main(int argc, char *argv[])
 
     double end = omp_get_wtime();
 
-    printf("Execution Time: %f seconds\n",end-start);
-
+    //printf("Execution Time: %f seconds\n",end-start);
+    printf("TIME: %f\n", end-start);
     //Chnage output file name to avoid overwriting
     //FILE *out = fopen("output_parallel.pgm","wb");
-    FILE *out = fopen("images/omp_output.pgm","wb");
+    FILE *out = fopen("images/openmp_output.pgm","wb");
 
     fprintf(out,"P5\n%d %d\n255\n",width,height);
 
