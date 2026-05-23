@@ -4,17 +4,9 @@
  *   Serial Sobel Edge Detection with Gaussian Blur
  *   Baseline implementation for performance comparison.
  *   Pipeline: Load PGM → Gaussian Blur → Sobel Edge Detection → Save PGM
- *
- * COURSE:   EE7218 – High Performance Computing
- * GROUP:    02 (Electrical & Information Engineering)
- * MEMBERS:  EG/2021/4512 – W.A.P.N Fernando
- *           EG/2021/4654 – S.W.M Madhusan
- *
+
  * COMPILE:  gcc -O2 -o serial_sobel serial_sobel.c -lm -fopenmp
  * RUN:      ./serial_sobel input.pgm output.pgm
- *
- * NOTE: -fopenmp is used only for omp_get_wtime() high-resolution timer.
- *       No parallel regions are used in this file.
  ****************************************************************************/
 
 #include <stdio.h>
@@ -23,11 +15,9 @@
 #include <string.h>
 #include <omp.h>
 
-/* -------------------------------------------------------------------------
+/* -------------------
  * sobel_magnitude
- *   Computes the gradient magnitude from horizontal (gx) and vertical (gy)
- *   Sobel responses and clamps result to [0, 255].
- * ---------------------------------------------------------------------- */
+ * ------------------- */
 static int sobel_magnitude(int gx, int gy)
 {
     int val = (int)sqrt((double)(gx * gx + gy * gy));
@@ -36,12 +26,9 @@ static int sobel_magnitude(int gx, int gy)
     return val;
 }
 
-/* -------------------------------------------------------------------------
+/* -------------------
  * skip_pgm_comments
- *   PGM files may contain '#' comment lines in the header.
- *   This helper advances the file pointer past any comments so that
- *   subsequent fscanf calls see only numeric data.
- * ---------------------------------------------------------------------- */
+ * ------------------- */
 static void skip_pgm_comments(FILE *fp)
 {
     int c;
@@ -49,21 +36,20 @@ static void skip_pgm_comments(FILE *fp)
     {
         if (c == '#')
         {
-            /* consume the entire comment line */
             while ((c = fgetc(fp)) != EOF && c != '\n')
                 ;
         }
         else
         {
-            ungetc(c, fp);   /* put back non-comment character */
+            ungetc(c, fp);
             break;
         }
     }
 }
 
-/* =========================================================================
+/* ===================================
  * MAIN
- * ====================================================================== */
+ * =================================== */
 int main(int argc, char *argv[])
 {
     const char *in_path  = (argc >= 2) ? argv[1] : "input.pgm";
@@ -95,7 +81,7 @@ int main(int argc, char *argv[])
     fscanf(fp, "%d %d", &width, &height);
     skip_pgm_comments(fp);
     fscanf(fp, "%d", &maxval);
-    fgetc(fp);   /* consume the single whitespace byte after maxval */
+    fgetc(fp);
 
     printf("Image: %s  [%d x %d], maxval=%d\n", in_path, width, height, maxval);
 
@@ -151,9 +137,9 @@ int main(int argc, char *argv[])
         { 1,  2,  1}
     };
 
-    /* ================================================================
+    /* ===================================
      * START TIMING
-     * ============================================================== */
+     * =================================== */
     double t_start = omp_get_wtime();
 
     /* ---- Stage 1: Gaussian Blur ---- */
@@ -189,9 +175,9 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* ================================================================
+    /* ===================================
      * END TIMING
-     * ============================================================== */
+     * =================================== */
     double t_end = omp_get_wtime();
 
     printf("Serial execution time : %.6f seconds\n", t_end - t_start);

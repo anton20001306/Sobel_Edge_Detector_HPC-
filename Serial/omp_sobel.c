@@ -2,28 +2,12 @@
  * FILE: omp_sobel.c
  * DESCRIPTION:
  *   OpenMP Parallel Sobel Edge Detection with Gaussian Blur.
- *   The outer row-loop of each convolution stage is parallelised with
- *   OpenMP's static schedule so that every thread processes a contiguous
- *   block of rows with no false-sharing.
  *
  *   Pipeline:
  *     Load PGM → [OMP] Gaussian Blur → [OMP] Sobel Edge Detection → Save PGM
  *
- * COURSE:   EE7218 – High Performance Computing
- * GROUP:    02 (Electrical & Information Engineering)
- * MEMBERS:  EG/2021/4512 – W.A.P.N Fernando
- *           EG/2021/4654 – S.W.M Madhusan
- *
  * COMPILE:  gcc -O2 -fopenmp -o omp_sobel omp_sobel.c -lm
  * RUN:      ./omp_sobel [input.pgm] [output.pgm] [num_threads]
- *
- * THREAD COUNT: Pass as third argument, or set OMP_NUM_THREADS env variable.
- *              Defaults to the hardware concurrency reported by OpenMP.
- *
- * BENCHMARKING NOTES:
- *   - I/O is excluded from timing (only computation is measured).
- *   - Run with 1, 2, 4, 8, 16 threads and record Execution Time for
- *     speedup and efficiency analysis.
  ****************************************************************************/
 
 #include <omp.h>
@@ -34,7 +18,6 @@
 
 /* -------------------------------------------------------------------------
  * sobel_magnitude
- *   Clamps gradient magnitude to the range [0, 255].
  * ---------------------------------------------------------------------- */
 static inline int sobel_magnitude(int gx, int gy)
 {
@@ -46,7 +29,6 @@ static inline int sobel_magnitude(int gx, int gy)
 
 /* -------------------------------------------------------------------------
  * skip_pgm_comments
- *   Advances the file pointer past any '#' comment lines in a PGM header.
  * ---------------------------------------------------------------------- */
 static void skip_pgm_comments(FILE *fp)
 {
@@ -71,7 +53,7 @@ int main(int argc, char *argv[])
 {
     const char *in_path  = (argc >= 2) ? argv[1] : "input.pgm";
     const char *out_path = (argc >= 3) ? argv[2] : "output_omp.pgm";
-    int num_threads      = (argc >= 4) ? atoi(argv[3]) : 0; /* 0 = use default */
+    int num_threads      = (argc >= 4) ? atoi(argv[3]) : 0;
 
     if (num_threads > 0)
         omp_set_num_threads(num_threads);
@@ -114,7 +96,7 @@ int main(int argc, char *argv[])
         fclose(fp); return 1;
     }
 
-    /* Border pixels: explicitly zero so output edges are clean */
+    /* Border pixels */
     memset(blur, 0, width * height);
     memset(edge, 0, width * height);
 
@@ -125,7 +107,7 @@ int main(int argc, char *argv[])
     }
     fclose(fp);
 
-    /* ---- Kernels (declared outside parallel region – read-only shared) ---- */
+    /* ---- Kernels---- */
 
     /* Gaussian blur kernel, sum = 16 */
     const int G[3][3] =
@@ -150,17 +132,14 @@ int main(int argc, char *argv[])
     };
 
     /*
-     * Chunk size for static scheduling.
-     * Setting chunk = height / (4 * nthreads) gives each thread several
-     * small, balanced slabs and avoids the overhead of dynamic scheduling.
-     * We compute it inside the parallel region after we know nthreads.
+     * Setting chunk = height / (4 * nthreads)
      */
     int nthreads = 0;
-    int chunk    = 1;   /* conservative default; overridden below */
+    int chunk    = 1;
 
-    /* ================================================================
-     * PARALLEL REGION – both convolution passes share the same team
-     * ============================================================== */
+    /* ============================
+     * PARALLEL REGION 
+     * ============================ */
     double t_start = omp_get_wtime();
 
 #pragma omp parallel shared(image, blur, edge, width, height, \
@@ -175,12 +154,9 @@ int main(int argc, char *argv[])
             printf("Threads : %d  |  chunk = %d rows\n", nthreads, chunk);
         }
 
-        /* ============================================================
+        /* ============================
          * STAGE 1: Gaussian Blur
-         * Each thread processes 'chunk' consecutive rows at a time.
-         * No inter-thread dependencies – each output pixel reads only
-         * from 'image', which is read-only in this pass.
-         * ========================================================== */
+         * ============================ */
 #pragma omp for schedule(static, chunk)
         for (int i = 1; i < height - 1; i++)
         {
@@ -194,26 +170,13 @@ int main(int argc, char *argv[])
                 blur[i * width + j] = (unsigned char)(sum / 16);
             }
         }
-        /*
-         * Implicit barrier at end of 'omp for' ensures all of 'blur'
-         * is fully written before any thread reads it in Stage 2.
-         */
 
-        /* ============================================================
+        /* ============================
          * STAGE 2: Sobel Edge Detection
-         * Reads from 'blur' (fully written after Stage 1 barrier).
-         * Each output pixel is independent – no race conditions.
-         * ========================================================== */
+         * ============================ */
 #pragma omp for schedule(static, chunk)
         for (int i = 1; i < height - 1; i++)
         {
-            /*
-             * NOTE: The per-row printf that appeared in the original
-             * implementation has been intentionally removed.
-             * For a 512×512 image it would generate ~260 000 print calls,
-             * serialising the threads on the I/O lock and completely
-             * invalidating any timing measurement.
-             */
             for (int j = 1; j < width - 1; j++)
             {
                 int gx = 0, gy = 0;

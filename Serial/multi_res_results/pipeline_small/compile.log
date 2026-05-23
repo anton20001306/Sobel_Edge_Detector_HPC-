@@ -1,0 +1,79 @@
+serial_sobel.c: In function ‘main’:
+serial_sobel.c:85:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   85 |     fscanf(fp, "%7s", format);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+serial_sobel.c:95:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   95 |     fscanf(fp, "%d %d", &width, &height);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+serial_sobel.c:97:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   97 |     fscanf(fp, "%d", &maxval);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+omp_sobel.c: In function ‘main’:
+omp_sobel.c:91:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   91 |     fscanf(fp, "%7s", format);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+omp_sobel.c:93:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   93 |     fscanf(fp, "%d %d", &width, &height);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+omp_sobel.c:95:5: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   95 |     fscanf(fp, "%d", &maxval);
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+mpi_sobel.c: In function ‘main’:
+mpi_sobel.c:99:33: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+   99 |         skip_pgm_comments(fp);  fscanf(fp, "%7s", fmt);
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~
+mpi_sobel.c:100:33: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  100 |         skip_pgm_comments(fp);  fscanf(fp, "%d %d", &width, &height);
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+mpi_sobel.c:101:33: warning: ignoring return value of ‘fscanf’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  101 |         skip_pgm_comments(fp);  fscanf(fp, "%d", &maxval);
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~
+hybrid_sobel.cu(196): warning #1650-D: result of call is not used
+          skip_pgm_comments(fp); fscanf(fp, "%7s", fmt);
+                                 ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+hybrid_sobel.cu(197): warning #1650-D: result of call is not used
+          skip_pgm_comments(fp); fscanf(fp, "%d %d", &width, &height);
+                                 ^
+
+hybrid_sobel.cu(198): warning #1650-D: result of call is not used
+          skip_pgm_comments(fp); fscanf(fp, "%d", &maxval);
+                                 ^
+
+hybrid_sobel.cu(206): warning #1650-D: result of call is not used
+          fread(full_image, 1, width * height, fp);
+          ^
+
+hybrid_sobel.cu(196): warning #1650-D: result of call is not used
+          skip_pgm_comments(fp); fscanf(fp, "%7s", fmt);
+                                 ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+hybrid_sobel.cu(197): warning #1650-D: result of call is not used
+          skip_pgm_comments(fp); fscanf(fp, "%d %d", &width, &height);
+                                 ^
+
+hybrid_sobel.cu(198): warning #1650-D: result of call is not used
+          skip_pgm_comments(fp); fscanf(fp, "%d", &maxval);
+                                 ^
+
+hybrid_sobel.cu(206): warning #1650-D: result of call is not used
+          fread(full_image, 1, width * height, fp);
+          ^
+
+hybrid_sobel.cu: In function ‘int main(int, char**)’:
+hybrid_sobel.cu:196:30: warning: ignoring return value of ‘int fscanf(FILE*, const char*, ...)’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  196 |         skip_pgm_comments(fp);  fscanf(fp, "%7s", fmt);
+      |                        ~~~~~~^~~~~~~~~~~~~~~~
+hybrid_sobel.cu:197:30: warning: ignoring return value of ‘int fscanf(FILE*, const char*, ...)’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  197 |         skip_pgm_comments(fp);  fscanf(fp, "%d %d", &width, &height);
+      |                        ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+hybrid_sobel.cu:198:30: warning: ignoring return value of ‘int fscanf(FILE*, const char*, ...)’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  198 |         skip_pgm_comments(fp);  fscanf(fp, "%d", &maxval);
+      |                        ~~~~~~^~~~~~~~~~~~~~~~~~~
+hybrid_sobel.cu:206:6: warning: ignoring return value of ‘size_t fread(void*, size_t, size_t, FILE*)’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  206 |         fread(full_image, 1, width * height, fp);
+      |      ^  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

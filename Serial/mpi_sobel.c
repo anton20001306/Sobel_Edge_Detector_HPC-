@@ -2,37 +2,10 @@
  * FILE: mpi_sobel.c
  * DESCRIPTION:
  *   Distributed-Memory Sobel Edge Detection using MPI.
- *
- *   Parallelisation Strategy – Row-Slab Decomposition with Ghost Rows:
- *     Rank 0 reads the full image, then distributes non-overlapping row
- *     slabs to all ranks via MPI_Scatterv.  Because the Sobel and
- *     Gaussian kernels require one row of context above and below each
- *     computed row, each interior rank exchanges one ghost row with its
- *     upper and lower neighbours using MPI_Sendrecv before computation.
- *     After local processing, results are gathered back to rank 0 with
- *     MPI_Gatherv and written to disk.
- *
- *   Pipeline:
- *     Rank 0: Read PGM
- *     All:    MPI_Scatterv  → local slab (+ ghost rows)
- *     All:    Exchange ghost rows (MPI_Sendrecv)
- *     All:    Gaussian Blur  (on local slab)
- *     All:    Exchange ghost rows for blur buffer
- *     All:    Sobel Edge Detection (on local slab)
- *     All:    MPI_Gatherv
- *     Rank 0: Write PGM
- *
- * COURSE:   EE7218 – High Performance Computing
- * GROUP:    02 (Electrical & Information Engineering)
- * MEMBERS:  EG/2021/4512 – W.A.P.N Fernando
- *           EG/2021/4654 – S.W.M Madhusan
- *
+ * 
  * COMPILE:  mpicc -O2 -o mpi_sobel mpi_sobel.c -lm
  * RUN:      mpirun -np 4 ./mpi_sobel input.pgm output_mpi.pgm
  *           mpirun -np 1 ./mpi_sobel input.pgm output_mpi.pgm   (baseline)
- *
- * ACCURACY: Output should be pixel-identical to the serial version.
- *           Compute RMSE = 0 is expected for all process counts.
  ****************************************************************************/
 
 #include <mpi.h>
@@ -41,7 +14,7 @@
 #include <math.h>
 #include <string.h>
 
-/* ---- Sobel gradient magnitude, clamped to [0, 255] ---- */
+/* ---- Sobel gradient magnitude ---- */
 static inline int sobel_magnitude(int gx, int gy)
 {
     int val = (int)sqrt((double)(gx * gx + gy * gy));
@@ -50,7 +23,7 @@ static inline int sobel_magnitude(int gx, int gy)
     return val;
 }
 
-/* ---- Skip '#' comment lines in PGM headers ---- */
+/* ---- Skip comment lines in PGM headers ---- */
 static void skip_pgm_comments(FILE *fp)
 {
     int c;
@@ -63,9 +36,9 @@ static void skip_pgm_comments(FILE *fp)
     }
 }
 
-/* =========================================================================
+/* =====================
  * MAIN
- * ====================================================================== */
+ * ===================== */
 int main(int argc, char *argv[])
 {
     MPI_Init(&argc, &argv);
@@ -79,13 +52,13 @@ int main(int argc, char *argv[])
 
     int width = 0, height = 0, maxval = 0;
 
-    /* ---- Read-only image buffer (populated only on rank 0) ---- */
+    /* ---- Read-only image buffer ---- */
     unsigned char *full_image = NULL;
     unsigned char *full_edge  = NULL;
 
-    /* ================================================================
+    /* =====================================
      * RANK 0: Read PGM header and pixel data
-     * ============================================================== */
+     * ===================================== */
     if (rank == 0)
     {
         FILE *fp = fopen(in_path, "rb");
@@ -128,19 +101,15 @@ int main(int argc, char *argv[])
         fclose(fp);
     }
 
-    /* ================================================================
+    /* =====================================
      * Broadcast image dimensions to all ranks
-     * ============================================================== */
+     * ===================================== */
     MPI_Bcast(&width,  1, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&height, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-    /* ================================================================
+    /* =====================================
      * Compute row-slab distribution
-     *
-     * Each rank receives (base_rows) rows; the first (rem) ranks
-     * receive one extra row to handle images not evenly divisible by
-     * the process count.
-     * ============================================================== */
+     * ===================================== */
     int base_rows = height / size;
     int rem       = height % size;
 
@@ -161,14 +130,10 @@ int main(int argc, char *argv[])
     int local_rows   = row_counts[rank];
     int local_pixels = local_rows * width;
 
-    /* ================================================================
+    /* =====================================
      * Allocate local buffers
-     *
-     * We allocate (local_rows + 2) × width to hold one ghost row
-     * above and one below the local slab.  The actual slab data
-     * occupies rows [1 .. local_rows] (0-indexed).
-     * ============================================================== */
-    int buf_rows   = local_rows + 2;  /* +1 ghost top, +1 ghost bottom */
+     * ===================================== */
+    int buf_rows   = local_rows + 2;
     int buf_pixels = buf_rows * width;
 
     unsigned char *local_image = (unsigned char *)calloc(buf_pixels, 1);
@@ -181,9 +146,9 @@ int main(int argc, char *argv[])
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
 
-    /* ================================================================
-     * Scatter image rows (data lands at offset width, skipping ghost row 0)
-     * ============================================================== */
+    /* =====================================
+     * Scatter image rows
+     * ===================================== */
     MPI_Scatterv(
         full_image,              /* send buffer (rank 0 only) */
         sendcounts, displs,      /* counts and offsets         */
@@ -194,24 +159,16 @@ int main(int argc, char *argv[])
         0, MPI_COMM_WORLD
     );
 
-    /* Free the full image on rank 0 – no longer needed until Gatherv */
+    /* Free the full image on rank 0 */
     if (rank == 0) { free(full_image); full_image = NULL; }
 
-    /* ================================================================
+    /* =====================================
      * Exchange ghost rows for the image buffer
-     *
-     * Correct pattern: each rank sends its BOTTOM row DOWN and
-     * receives its TOP ghost from UP in the same call (call 1),
-     * then sends its TOP row UP and receives its BOTTOM ghost
-     * from DOWN (call 2).  Tags are shared between the matching
-     * pair so ranks never wait on a tag the other has already passed.
-     *
-     * For boundary ranks MPI_PROC_NULL makes the send or recv a no-op.
-     * ============================================================== */
+     * ===================================== */
     int up   = (rank > 0)        ? rank - 1 : MPI_PROC_NULL;
     int down = (rank < size - 1) ? rank + 1 : MPI_PROC_NULL;
 
-    /* Call 1: send my bottom real row → down;  recv top ghost ← up */
+    /* Call 1: */
     MPI_Sendrecv(
         local_image + local_rows * width,       /* send: my last real row  */
         width, MPI_UNSIGNED_CHAR, down, 0,
@@ -220,7 +177,7 @@ int main(int argc, char *argv[])
         MPI_COMM_WORLD, MPI_STATUS_IGNORE
     );
 
-    /* Call 2: send my top real row → up;  recv bottom ghost ← down */
+    /* Call 2: */
     MPI_Sendrecv(
         local_image + width,                     /* send: my first real row */
         width, MPI_UNSIGNED_CHAR, up,   1,
@@ -242,15 +199,12 @@ int main(int argc, char *argv[])
     MPI_Barrier(MPI_COMM_WORLD);
     double t_start = MPI_Wtime();
 
-    /* ================================================================
-     * STAGE 1: Gaussian Blur (on local slab, using ghost rows)
-     *
-     * We loop over real rows 1..local_rows (in the padded buffer).
-     * Row 0 and row (local_rows+1) are ghost rows from neighbours.
-     * ============================================================== */
+    /* =====================================
+     * STAGE 1: Gaussian Blur
+     * ===================================== */
     /*
      * BORDER FIX: serial code skips global row 0 and row (height-1).
-     * Rank 0 owns global row 0 at buffer row 1  → start from row 2.
+     * Rank 0 owns global row 0 at buffer row 1  → start from ro    w 2.
      * Last rank owns global row (height-1) at buffer row local_rows → end at local_rows-1.
      * Buffers are calloc'd (zero), so skipped rows stay 0 — matching serial exactly.
      */
