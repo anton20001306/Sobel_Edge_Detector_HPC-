@@ -1,0 +1,69 @@
+================================================================================
+  PARALLEL SOBEL EDGE DETECTOR – BENCHMARK RESULTS
+  EE7218 High Performance Computing | Group 02
+  EG/2021/4512 W.A.P.N Fernando  |  EG/2021/4654 S.W.M Madhusan
+  Generated : 2026-05-22 21:53:23
+================================================================================
+
+  Input image     : multi_res_inputs/medium.png
+  Processed as    : pipeline_output/input.pgm  [2800x1600]
+  Serial baseline : 0.064590 seconds
+  Repeats / run   : 3  (median reported)
+  CPU cores       : 8
+  GPU support     : true
+
+────────────────────────────────────────────────────────────────────────────────
+  EXECUTION TIME  (computation only — I/O excluded)
+────────────────────────────────────────────────────────────────────────────────
+Implementation             Workers     Time (s)       Speedup      Efficiency  
+────────────────────────── ─────────── ────────────── ──────────── ────────────
+Serial (baseline)          1 thread    0.064590       1.0000 x     100.0%      
+OpenMP                     1 threads   0.060303       1.0711 x     107.1%      
+OpenMP                     2 threads   0.031377       2.0585 x     102.9%      
+OpenMP                     4 threads   0.016774       3.8506 x     96.3%       
+OpenMP                     8 threads   0.032339       1.9973 x     25.0%       
+OpenMP                     16 threads  0.019279       3.3503 x     20.9%       
+
+MPI                        1 processes 0.056160       1.1501 x     115.0%      
+MPI                        2 processes 0.029400       2.1969 x     109.8%      
+MPI                        4 processes 0.027324       2.3639 x     59.1%       
+MPI                        8 processes 0.017722       3.6446 x     45.6%       
+
+MPI+CUDA Hybrid            4 ranks     0.007113       9.0806 x     227.0%      
+
+  GPU Transfer Overhead:  H2D = 2.373 ms  |  D2H = 1.564 ms
+
+────────────────────────────────────────────────────────────────────────────────
+  ACCURACY  (RMSE vs serial baseline — lower is better, 0 = identical)
+────────────────────────────────────────────────────────────────────────────────
+  Output File                                RMSE    Max Diff  Status
+  -------------------------------------- --------  ----------  --------
+  output_hybrid.pgm                        0.0000         0.0  PASS ✔
+  output_mpi_1p.pgm                        0.0000         0.0  PASS ✔
+  output_mpi_2p.pgm                        0.0000         0.0  PASS ✔
+  output_mpi_4p.pgm                        0.0000         0.0  PASS ✔
+  output_mpi_8p.pgm                        0.0000         0.0  PASS ✔
+  output_omp_16t.pgm                       0.0000         0.0  PASS ✔
+  output_omp_1t.pgm                        0.0000         0.0  PASS ✔
+  output_omp_2t.pgm                        0.0000         0.0  PASS ✔
+  output_omp_4t.pgm                        0.0000         0.0  PASS ✔
+  output_omp_8t.pgm                        0.0000         0.0  PASS ✔
+
+────────────────────────────────────────────────────────────────────────────────
+  OUTPUT FILES
+────────────────────────────────────────────────────────────────────────────────
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/input.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_hybrid.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_mpi_1p.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_mpi_2p.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_mpi_4p.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_mpi_8p.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_omp_16t.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_omp_1t.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_omp_2t.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_omp_4t.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_omp_8t.pgm
+-rwxrwxrwx 1 milinda1892 milinda1892 4.3M May 22 21:53 pipeline_output/output_serial.pgm
+
+  Pipeline completed: 2026-05-22 21:53:23
+================================================================================
