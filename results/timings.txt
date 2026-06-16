@@ -1,0 +1,42 @@
+============================================================
+        Sobel Edge Detector HPC Benchmark Report
+============================================================
+
+Input Image   : input.pgm [512x512]
+CPU Cores     : 4
+GPU Support   : false
+
+EXECUTION TIME
+Implementation         Workers         Time(s)   
+
+Serial                 1 thread        0.009189  
+OpenMP                 2 threads       0.005888  
+OpenMP                 4 threads       0.005095  
+OpenMP                 8 threads       0.012961  
+MPI Ghost              2 processes     0.004553  
+MPI Ghost              4 processes     0.002275  
+
+ACCURACY ANALYSIS
+
+========== SSD / RMSE RESULTS ==========
+
+OpenMP Results
+--------------------------
+SSD  : 0
+RMSE : 0.000000
+
+MPI Ghost Results
+--------------------------
+SSD  : 0
+RMSE : 0.000000
+
+========== ANALYSIS ==========
+OpenMP output is IDENTICAL
+MPI Ghost output is IDENTICAL
+
+OBSERVATIONS
+- OpenMP achieved best performance at 4 threads.
+- 8 OpenMP threads caused overhead.
+- MPI Ghost preserved stencil correctness.
+
+============================================================
